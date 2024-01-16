@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kayıt Sistemi</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: row;
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-container {
+      flex: 1;
+      margin-right: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      font-size: 16px;
+    }
+
+    .form-group select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      font-size: 16px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 3px;
+      transition: background-color 0.3s;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background-color: #45a049;
+    }
+
+    .user-list {
+      flex: 1;
+      list-style: none;
+      padding: 0;
+    }
+
+    .user-list li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+      cursor: pointer;
+    }
+
+    .user-list li:last-child {
+      border-bottom: none;
+    }
+
+    .user-list li .remove-btn {
+      background-color: #f44336;
+      color: #fff;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .user-list li .remove-btn:hover {
+      background-color: #d32f2f;
+    }
+
+    .empty-message {
+      text-align: center;
+      color: #888;
+      font-style: italic;
+    }
+
+    .user-details {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .user-details h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .user-details .info {
+      margin-bottom: 10px;
+    }
+
+    .back-btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 3px;
+      transition: background-color 0.3s;
+      border: none;
+      cursor: pointer;
+    }
+
+    .back-btn:hover {
+      background-color: #45a049;
+    }
+  </style>
+  <script>
+    var users = [];
+
+    function addUser() {
+      var name = document.getElementById('name').value;
+      var age = document.getElementById('age').value;
+      var job = document.getElementById('job').value;
+      var tc = document.getElementById('tc').value;
+      var language = document.getElementById('language').value;
+      var motherName = document.getElementById('motherName').value;
+      var fatherName = document.getElementById('fatherName').value;
+      var position = document.getElementById('position').value;
+
+      var user = {
+        name: name,
+        age: age,
+        job: job,
+        tc: tc,
+        language: language,
+        motherName: motherName,
+        fatherName: fatherName,
+        position: position
+      };
+
+      users.push(user);
+
+      refreshUserList();
+      clearForm();
+      saveToLocalStorage();
+    }
+
+    function removeUser(index) {
+      users.splice(index, 1);
+
+      refreshUserList();
+      saveToLocalStorage();
+    }
+
+    function showUserDetails(index) {
+      var user = users[index];
+
+      var userDetailsHTML = `
+        <h2>${user.name} (${user.position})</h2>
+        <div class="info">
+          <strong>Yaş:</strong> ${user.age}<br>
+          <strong>İş:</strong> ${user.job}<br>
+          <strong>TC:</strong> ${user.tc}<br>
+          <strong>Dil:</strong> ${user.language}<br>
+          <strong>Anne Adı:</strong> ${user.motherName}<br>
+          <strong>Baba Adı:</strong> ${user.fatherName}<br>
+        </div>
+        <a href="#" class="back-btn" onclick="goBack()">Geri</a>
+      `;
+
+      document.getElementById('user-details').innerHTML = userDetailsHTML;
+      document.getElementById('user-details').style.display = 'block';
+    }
+
+    function goBack() {
+      document.getElementById('user-details').style.display = 'none';
+    }
+
+    function refreshUserList() {
+      var userList = document.getElementById('user-list');
+      userList.innerHTML = '';
+
+      if (users.length === 0) {
+        var emptyMessage = document.createElement('p');
+        emptyMessage.classList.add('empty-message');
+        emptyMessage.textContent = 'Kayıt bulunamadı.';
+        userList.appendChild(emptyMessage);
+      } else {
+        users.forEach(function(user, index) {
+          var listItem = document.createElement('li');
+          listItem.innerHTML = `
+            <span>${user.name}</span>
+            <span>${user.position}</span>
+            <button class="remove-btn" onclick="removeUser(${index})">Çıkart</button>
+          `;
+
+          listItem.addEventListener('click', function() {
+            showUserDetails(index);
+          });
+
+          userList.appendChild(listItem);
+        });
+      }
+    }
+
+    function clearForm() {
+      document.getElementById('name').value = '';
+      document.getElementById('age').value = '';
+      document.getElementById('job').value = '';
+      document.getElementById('tc').value = '';
+      document.getElementById('language').value = '';
+      document.getElementById('motherName').value = '';
+      document.getElementById('fatherName').value = '';
+      document.getElementById('position').value = '';
+    }
+
+    function saveToLocalStorage() {
+      localStorage.setItem('users', JSON.stringify(users));
+    }
+
+    function loadFromLocalStorage() {
+      var storedUsers = localStorage.getItem('users');
+
+      if (storedUsers) {
+        users = JSON.parse(storedUsers);
+        refreshUserList();
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+      loadFromLocalStorage();
+    });
+  </script>
+</head>
+<body>
+  <div class="container">
+    <div class="form-container">
+      <h1>Kayıt Sistemi</h1>
+
+      <div class="form-group">
+        <label for="name">İsim:</label>
+        <input type="text" id="name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="age">Yaş:</label>
+        <input type="number" id="age" required>
+      </div>
+
+      <div class="form-group">
+        <label for="job">İş:</label>
+        <input type="text" id="job" required>
+      </div>
+
+      <div class="form-group">
+        <label for="tc">TC:</label>
+        <input type="text" id="tc" required>
+      </div>
+
+      <div class="form-group">
+        <label for="language">Dil:</label>
+        <input type="text" id="language" required>
+      </div>
+
+      <div class="form-group">
+        <label for="motherName">Anne Adı:</label>
+        <input type="text" id="motherName" required>
+      </div>
+
+      <div class="form-group">
+        <label for="fatherName">Baba Adı:</label>
+        <input type="text" id="fatherName" required>
+      </div>
+
+      <div class="form-group">
+        <label for="position">Pozisyon:</label>
+        <select id="position" required>
+          <option value="Admin">Admin</option>
+          <option value="Kullanıcı">Kullanıcı</option>
+          <option value="Çalışan">Çalışan</option>
+        </select>
+      </div>
+
+      <button class="btn" onclick="addUser()">Kişi Ekle</button>
+    </div>
+
+    <ul id="user-list" class="user-list"></ul>
+  </div>
+
+  <div id="user-details" class="user-details" style="display: none;"></div>
+</body>
+</html>
